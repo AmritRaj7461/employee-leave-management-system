@@ -30,22 +30,24 @@ const Reimbursement = () => {
     const fetchClaims = async () => {
         try {
             const token = localStorage.getItem('token');
-            const headers = { Authorization: `Bearer ${token}` };
-            const res = await axios.get(`${API_BASE_URL}/api/reimbursement/all`, { headers });
+            const res = await axios.get(`${API_BASE_URL}/api/reimbursement/all`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
 
             if (Array.isArray(res.data)) {
                 const myClaims = res.data.filter(item => {
+                    // Get the ID from the populated object or the raw field
+                    const dbId = item.employeeId?._id || item.employeeId;
+                    const loggedInId = user?.id || user?._id;
 
-                    const applicantId = item.employeeId?._id || item.employeeId;
-
-                    return String(applicantId) === String(user?.id);
+                    // FORCE both to strings and trim any whitespace
+                    return String(dbId).trim() === String(loggedInId).trim();
                 });
 
-                console.log("Found matches for employee:", myClaims.length);
                 setClaims(myClaims);
             }
         } catch (err) {
-            console.error("Expense sync interrupted.");
+            console.error("Sync error:", err.response?.data?.message || err.message);
         }
     };
 
