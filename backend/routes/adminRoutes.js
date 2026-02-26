@@ -1,7 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const Config = require("../models/Config");
-const { verifyToken, isAdmin } = require("../middleware/authMiddleware");
+const AuditLog = require("../models/AuditLog");
+
+// Use the functions exactly as they are named in your authMiddleware.js
+const {
+  verifyToken,
+  isAdmin,
+  authorizeRoles,
+} = require("../middleware/authMiddleware");
 
 // GET current config
 router.get("/config", verifyToken, async (req, res) => {
@@ -27,5 +34,18 @@ router.put("/config", verifyToken, isAdmin, async (req, res) => {
   }
 });
 
-// CRITICAL: You must have this exact line at the bottom!
+// GET Security Logs (Admin Only)
+// Using isAdmin here to match your project's working patterns
+router.get("/logs", verifyToken, isAdmin, async (req, res) => {
+  try {
+    const logs = await AuditLog.find()
+      .populate("adminId", "name")
+      .sort({ timestamp: -1 })
+      .limit(50);
+    res.json(logs);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to retrieve logs" });
+  }
+});
+
 module.exports = router;

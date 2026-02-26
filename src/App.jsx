@@ -11,11 +11,11 @@ import Toast from './components/Toast';
 // Page Imports
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard'; // The "Traffic Controller" Dashboard
 import ApplyLeave from './pages/ApplyLeave';
 import Reimbursement from './pages/Reimbursement';
-import AdminPanel from './pages/AdminPanel';
 import Approvals from './pages/Approvals';
+import AdminPanel from './pages/AdminPanel';
 
 const AppLayout = ({ children, notification, onCloseToast }) => {
   const location = useLocation();
@@ -49,18 +49,17 @@ function App() {
     if (!user) return;
     try {
       const token = localStorage.getItem('token');
-      // This endpoint should return items where status != 'Pending' and notified == false
       const res = await axios.get('http://localhost:5000/api/notifications/pending', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
       if (res.data.updates && res.data.updates.length > 0) {
-        const item = res.data.updates[0]; // Process the first unread update
+        const item = res.data.updates[0];
         setNotification({
           id: item._id,
-          type: item.status, // 'Approved' or 'Rejected'
+          type: item.status,
           message: `Your ${item.category} request has been ${item.status}!`,
-          category: item.category // 'Leave' or 'Expense'
+          category: item.category
         });
       }
     } catch (err) {
@@ -68,7 +67,6 @@ function App() {
     }
   };
 
-  // Poll for notifications every 15 seconds while logged in
   useEffect(() => {
     if (user) {
       checkNotifications();
@@ -77,7 +75,6 @@ function App() {
     }
   }, [user]);
 
-  // Handle closing the toast and marking it as 'notified' in the DB
   const handleCloseToast = async () => {
     if (!notification) return;
     try {
@@ -91,7 +88,7 @@ function App() {
       setNotification(null);
     } catch (err) {
       console.error("Failed to mark notification as seen");
-      setNotification(null); // Close it anyway to avoid stuck UI
+      setNotification(null);
     }
   };
 
@@ -102,7 +99,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Role-Based Protected Routes */}
+          {/* FIX 1: Point /dashboard to the main Dashboard component, NOT AdminDashboard */}
           <Route path="/dashboard" element={
             <ProtectedRoute allowedRoles={['Employee', 'Manager', 'Admin']}>
               <Dashboard />
@@ -127,7 +124,8 @@ function App() {
             </ProtectedRoute>
           } />
 
-          <Route path="/admin" element={
+          {/* FIX 2: Correct path to match Sidebar and Dashboard navigation */}
+          <Route path="/admin-panel" element={
             <ProtectedRoute allowedRoles={['Admin']}>
               <AdminPanel />
             </ProtectedRoute>

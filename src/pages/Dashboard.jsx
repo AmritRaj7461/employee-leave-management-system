@@ -1,13 +1,16 @@
+// src/pages/Dashboard.jsx
 import React, { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import EmployeeDashboard from './EmployeeDashboard';
 import ManagerDashboard from './ManagerDashboard';
-import AdminDashboard from './AdminDashboard'; // Import the new view
+import AdminDashboard from './AdminDashboard';
 
 const Dashboard = () => {
     const { user } = useContext(AuthContext);
 
-    // Now Admins see a Dashboard, NOT the User Management panel
+    // DEBUG: Add this line to see exactly what role React sees
+    console.log("Current Logged-in Role:", user?.role);
+
     if (user?.role === 'Admin') {
         return <AdminDashboard />;
     }

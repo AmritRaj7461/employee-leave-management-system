@@ -1,6 +1,7 @@
-// --- Inside controllers/leaveController.js ---
+const Leave = require("../models/Leave");
 const Config = require("../models/Config");
 
+// Apply for leave (With Manager Auto-Approve Check)
 exports.applyLeave = async (req, res) => {
   try {
     const user = req.user;
@@ -8,9 +9,8 @@ exports.applyLeave = async (req, res) => {
 
     let initialStatus = "Pending";
 
-    // AUTO-APPROVE LOGIC
-    // If user is a Manager AND the Admin has enabled the auto-approve switch
-    if (user.role === "Manager" && systemConfig.autoApproveManagers) {
+    // AUTO-APPROVE LOGIC: Manager role + Admin toggle
+    if (user.role === "Manager" && systemConfig?.autoApproveManagers) {
       initialStatus = "Approved";
     }
 
@@ -29,10 +29,9 @@ exports.applyLeave = async (req, res) => {
   }
 };
 
-// Get leaves for a specific user (History Table)
+// Get history for the specific logged-in user
 exports.getUserLeaves = async (req, res) => {
   try {
-    // UPDATED: Added populate here so the user can see their own name/role in their history list
     const leaves = await Leave.find({ employeeId: req.params.userId })
       .populate("employeeId", "name role")
       .sort({ createdAt: -1 });
@@ -43,17 +42,14 @@ exports.getUserLeaves = async (req, res) => {
   }
 };
 
-// Manager/Admin: Get ALL leaves for approval portal
-const Leave = require("../models/Leave");
-
+// Manager/Admin: Get ALL leaves for the portal
 exports.getAllLeaves = async (req, res) => {
   try {
-    // 1. Fetch all leaves and attempt to fill in user details
     const leaves = await Leave.find()
-      .populate("employeeId", "name role department") // Critical for Frontend names
+      .populate("employeeId", "name role department")
       .sort({ createdAt: -1 });
 
-    // 2. Safety Filter: Remove any null entries if population failed
+    // Safety Filter for deleted users
     const cleanData = leaves.map((leave) => {
       if (!leave.employeeId) {
         return {
@@ -66,23 +62,41 @@ exports.getAllLeaves = async (req, res) => {
 
     res.status(200).json(cleanData);
   } catch (err) {
-    console.error("CRITICAL BACKEND ERROR:", err.message);
     res
       .status(500)
       .json({ message: "Internal Protocol Failure", error: err.message });
   }
 };
 
-// Manager/Admin: Update status (Approve/Reject)
+// UPDATE STATUS: Includes Admin Re-approval and Admin Reasons
 exports.updateLeaveStatus = async (req, res) => {
   try {
-    const { status } = req.body;
-    const leave = await Leave.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true },
-    );
-    res.json({ message: `Leave ${status}`, leave });
+    const { status, adminReason } = req.body;
+    const userRole = req.user.role;
+    const userId = req.user.id;
+
+    const leave = await Leave.findById(req.params.id);
+    if (!leave) return res.status(404).json({ message: "Leave not found" });
+
+    // HIERARCHY LOGIC:
+    // If a leave is already "Rejected", only an Admin can change it back to "Approved".
+    if (
+      leave.status === "Rejected" &&
+      status === "Approved" &&
+      userRole !== "Admin"
+    ) {
+      return res.status(403).json({
+        message:
+          "Hierarchy Restriction: Only an Admin can re-approve a rejected request.",
+      });
+    }
+
+    leave.status = status;
+    leave.adminReason = adminReason || ""; // Capture the reason
+    leave.updatedBy = userId; // Log who did it
+
+    await leave.save();
+    res.json({ message: `Leave status updated to ${status}`, leave });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

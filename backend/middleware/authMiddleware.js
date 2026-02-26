@@ -13,7 +13,19 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// Ensure this function exists!
+// Fixed: Added authorizeRoles to support different access levels
+const authorizeRoles = (...roles) => {
+  return (req, res, next) => {
+    if (req.user && roles.includes(req.user.role)) {
+      next();
+    } else {
+      res.status(403).json({
+        message: `Forbidden: This action requires one of the following roles: ${roles.join(", ")}`,
+      });
+    }
+  };
+};
+
 const isAdmin = (req, res, next) => {
   if (req.user && req.user.role === "Admin") {
     next();
@@ -22,5 +34,5 @@ const isAdmin = (req, res, next) => {
   }
 };
 
-// CRITICAL: You must export BOTH as an object
-module.exports = { verifyToken, isAdmin };
+// CRITICAL: Exporting all three functions as an object
+module.exports = { verifyToken, authorizeRoles, isAdmin };

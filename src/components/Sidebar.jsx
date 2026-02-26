@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
 import {
@@ -13,108 +13,121 @@ const Sidebar = () => {
   const { user, logout } = useContext(AuthContext);
   const { isDarkMode } = useContext(ThemeContext);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
 
-  const sidebarBg = isDarkMode ? 'bg-[#0f172a] border-r border-white/5' : 'bg-white border-r border-slate-100';
-  const textColor = isDarkMode ? 'text-white' : 'text-slate-800';
-  const activeItem = 'bg-blue-600 text-white shadow-lg shadow-blue-600/20';
-  const inactiveItem = isDarkMode ? 'text-slate-400 hover:bg-white/5' : 'text-slate-500 hover:bg-slate-50';
+  // --- PRECISE THEME MATCHING ---
+  // Using the exact deep dark hex from your dashboard video
+  const sidebarBg = isDarkMode
+    ? 'bg-[#0f172a] border-r border-white/5'
+    : 'bg-white border-r border-slate-200';
+
+  const textColor = isDarkMode ? 'text-slate-100' : 'text-slate-900';
+  const subText = isDarkMode ? 'text-blue-500' : 'text-blue-600';
+  const iconColor = isDarkMode ? 'text-slate-400' : 'text-slate-500';
 
   const menuItems = [
-    { name: 'Dashboard', icon: <LayoutDashboard size={22} />, path: '/dashboard', roles: ['Employee', 'Manager', 'Admin'] },
-    { name: 'Apply Leave', icon: <FilePlus size={22} />, path: '/apply-leave', roles: ['Employee', 'Manager', 'Admin'] },
-    { name: 'Reimbursement', icon: <IndianRupee size={22} />, path: '/reimbursement', roles: ['Employee', 'Manager', 'Admin'] },
-    { name: 'Approvals', icon: <CheckSquare size={22} />, path: '/approvals', roles: ['Manager', 'Admin'] },
-    { name: 'Admin Panel', icon: <Users size={22} />, path: '/admin', roles: ['Admin'] },
+    { name: 'Dashboard', icon: <LayoutDashboard size={20} />, path: '/dashboard', roles: ['Employee', 'Manager', 'Admin'] },
+    { name: 'Apply Leave', icon: <FilePlus size={20} />, path: '/apply-leave', roles: ['Employee', 'Manager', 'Admin'] },
+    { name: 'Reimbursement', icon: <IndianRupee size={20} />, path: '/reimbursement', roles: ['Employee', 'Manager', 'Admin'] },
+    { name: 'Approvals', icon: <CheckSquare size={20} />, path: '/approvals', roles: ['Manager', 'Admin'] },
+    { name: 'Admin Panel', icon: <Users size={20} />, path: '/admin-panel', roles: ['Admin'] },
   ];
 
   return (
     <motion.div
       initial={false}
-      animate={{ width: isCollapsed ? 90 : 280 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      // h-screen and sticky keep it from scrolling with the page
-      className={`h-screen sticky top-0 flex flex-col transition-colors duration-500 z-50 ${sidebarBg}`}
+      animate={{ width: isCollapsed ? 100 : 300 }}
+      transition={{ type: "spring", stiffness: 200, damping: 25 }}
+      className={`h-screen sticky top-0 flex flex-col transition-colors duration-500 z-50 ${sidebarBg} shadow-2xl`}
     >
+      {/* COLLAPSE TOGGLE */}
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className={`absolute -right-4 top-10 w-8 h-8 rounded-full border flex items-center justify-center transition-all z-[60] ${isDarkMode ? 'bg-slate-800 border-white/10 text-white' : 'bg-white border-slate-200 text-slate-600'
-          } shadow-xl hover:scale-110`}
+        className={`absolute -right-4 top-12 w-9 h-9 rounded-xl border flex items-center justify-center transition-all z-[60] ${isDarkMode ? 'bg-[#111827] border-white/10 text-white shadow-blue-900/20' : 'bg-white border-slate-200 text-slate-800 shadow-xl'
+          } hover:scale-110 active:scale-95`}
       >
-        {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        {isCollapsed ? <ChevronRight size={18} strokeWidth={3} /> : <ChevronLeft size={18} strokeWidth={3} />}
       </button>
 
-      <div className={`p-8 mb-4 flex items-center ${isCollapsed ? 'justify-center' : 'gap-4'}`}>
-        <div className="relative flex-shrink-0">
-          <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center font-black text-white shadow-xl shadow-blue-600/40">
-            {user?.role?.charAt(0)}
-          </div>
-          <AnimatePresence>
-            {!isCollapsed && (
-              <motion.div initial={{ opacity: 0, scale: 0 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0 }} className="absolute -top-1 -right-1">
-                <Sparkles size={14} className="text-yellow-500 animate-pulse" />
-              </motion.div>
-            )}
-          </AnimatePresence>
+      {/* BRANDING / PROFILE */}
+      <div className={`p-10 mb-6 flex items-center ${isCollapsed ? 'justify-center' : 'gap-5'}`}>
+        <div className="w-14 h-14 bg-gradient-to-br from-blue-700 to-blue-500 rounded-[1.25rem] flex-shrink-0 flex items-center justify-center font-black text-xl text-white shadow-2xl shadow-blue-600/30">
+          {user?.role?.charAt(0)}
         </div>
 
         <AnimatePresence mode="wait">
           {!isCollapsed && (
-            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.2 }} className="whitespace-nowrap overflow-hidden">
-              <h1 className={`text-lg font-black tracking-tighter leading-none ${textColor}`}>{user?.role} Portal</h1>
-              <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest mt-1">Systems Core</p>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ delay: 0.1 }}
+              className="whitespace-nowrap overflow-hidden"
+            >
+              <h1 className={`text-xl font-black tracking-tight leading-none ${textColor}`}>
+                {user?.role} <span className="text-blue-500 italic">Portal</span>
+              </h1>
+              <div className="flex items-center gap-2 mt-1.5">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${subText}`}>Systems Core</p>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      <nav className="flex-1 px-4 space-y-2 overflow-y-auto no-scrollbar">
+      {/* NAVIGATION */}
+      <nav className="flex-1 px-6 space-y-3 overflow-y-auto no-scrollbar">
         {menuItems.map((item) => {
           if (!item.roles.includes(user?.role)) return null;
           const isActive = location.pathname === item.path;
+
           return (
-            <div key={item.name} className="relative group">
-              <Link to={item.path} className={`flex items-center rounded-2xl transition-all duration-300 h-14 overflow-hidden ${isCollapsed ? 'justify-center' : 'px-5 gap-4'} ${isActive ? activeItem : inactiveItem}`}>
-                <span className={`flex-shrink-0 ${isActive ? 'text-white' : 'group-hover:text-blue-500'}`}>{item.icon}</span>
-                <AnimatePresence mode="wait">
-                  {!isCollapsed && (
-                    <motion.span initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: 'auto' }} exit={{ opacity: 0, width: 0 }} transition={{ duration: 0.2 }} className="text-sm font-black uppercase tracking-widest whitespace-nowrap">
-                      {item.name}
-                    </motion.span>
-                  )}
-                </AnimatePresence>
-              </Link>
-              {/* TOOLTIP ON HOVER */}
-              {isCollapsed && (
-                <div className={`absolute left-full ml-4 px-4 py-2 shadow-[0_0_20px_rgba(79,70,229,0.2)] ${isDarkMode
-                  ? 'bg-indigo-600 text-white border-white/20'
-                  : 'bg-slate-900 text-white border-slate-700'
-                  } text-[10px] font-black uppercase tracking-widest rounded-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-300 whitespace-nowrap z-[100] border`}>
+            <Link
+              key={item.name}
+              to={item.path}
+              className={`group flex items-center rounded-2xl transition-all duration-300 h-16 ${isCollapsed ? 'justify-center' : 'px-6 gap-5'
+                } ${isActive
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                  : isDarkMode ? 'text-slate-400 hover:bg-white/5 hover:text-white' : 'text-slate-500 hover:bg-blue-50 hover:text-blue-600'
+                }`}
+            >
+              <span className={`flex-shrink-0 transition-transform group-hover:scale-110 ${isActive ? 'text-white' : iconColor}`}>
+                {item.icon}
+              </span>
+
+              {!isCollapsed && (
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                  className="text-xs font-black uppercase tracking-[0.15em] whitespace-nowrap"
+                >
                   {item.name}
-                  {/* Arrow */}
-                  <div className={`absolute -left-1 top-1/2 -translate-y-1/2 w-2 h-2 rotate-45 ${isDarkMode ? 'bg-indigo-600' : 'bg-slate-900'}`}></div>
-                </div>
+                </motion.span>
               )}
-            </div>
+            </Link>
           );
         })}
       </nav>
 
-      {/* FOOTER SECTION: Fixed at bottom within screen height */}
-      <div className={`p-4 border-t ${isDarkMode ? 'border-white/5' : 'border-slate-50'}`}>
+      {/* FOOTER SECTION */}
+      <div className={`p-8 border-t ${isDarkMode ? 'border-white/5' : 'border-slate-200'}`}>
         <button
           onClick={logout}
-          className={`w-full flex items-center rounded-2xl transition-all h-14 text-rose-500 bg-rose-500/5 hover:bg-rose-500/10 overflow-hidden ${isCollapsed ? 'justify-center' : 'px-5 gap-4'}`}
+          className={`w-full flex items-center rounded-2xl transition-all h-16 text-rose-500 bg-rose-500/5 hover:bg-rose-500/10 ${isCollapsed ? 'justify-center' : 'px-6 gap-5'
+            }`}
         >
-          <LogOut size={20} className="flex-shrink-0" />
-          <AnimatePresence mode="wait">
-            {!isCollapsed && (
-              <motion.span initial={{ opacity: 0, width: 0 }} animate={{ opacity: 1, width: 'auto' }} exit={{ opacity: 0, width: 0 }} className="text-[11px] font-black uppercase tracking-widest whitespace-nowrap">
-                Terminate
-              </motion.span>
-            )}
-          </AnimatePresence>
+          <LogOut size={22} className="flex-shrink-0" />
+          {!isCollapsed && (
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-[11px] font-black uppercase tracking-[0.3em] whitespace-nowrap"
+            >
+              Log Out
+            </motion.span>
+          )}
         </button>
       </div>
     </motion.div>

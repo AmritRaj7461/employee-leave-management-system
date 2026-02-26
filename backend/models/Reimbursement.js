@@ -12,6 +12,8 @@ const ReimbursementSchema = new mongoose.Schema(
     },
     title: { type: String, required: true },
     amount: { type: Number, required: true },
+    // ADD THIS LINE BELOW
+    proof: { type: String, default: null },
     status: {
       type: String,
       enum: ["Pending", "Approved", "Rejected"],

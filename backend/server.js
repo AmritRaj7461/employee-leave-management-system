@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const path = require("path");
 
 // Route Imports
 const authRoutes = require("./routes/authRoutes");
@@ -21,6 +22,8 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected: Leave_Management"))
   .catch((err) => console.log(err));
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Use Routes
 app.use("/api/auth", authRoutes);

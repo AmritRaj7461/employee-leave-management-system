@@ -1,14 +1,18 @@
 const express = require("express");
 const router = express.Router();
+const upload = require("../middleware/uploadMiddleware"); // Ensure this file exists
 const {
   applyReimbursement,
   getUserClaims,
   getAllClaims,
-  updateReimbursementStatus, // Must be imported here
+  updateReimbursementStatus,
 } = require("../controllers/reimbursementController");
 const { verifyToken, authorizeRoles } = require("../middleware/auth");
 
-router.post("/apply", verifyToken, applyReimbursement);
+// UPDATED: Added upload.single("proof") middleware
+// "proof" must match the key you used in your frontend FormData
+router.post("/apply", verifyToken, upload.single("proof"), applyReimbursement);
+
 router.get("/user/:userId", verifyToken, getUserClaims);
 
 // Manager/Admin protected routes
@@ -18,6 +22,7 @@ router.get(
   authorizeRoles("Manager", "Admin"),
   getAllClaims,
 );
+
 router.put(
   "/status/:id",
   verifyToken,
