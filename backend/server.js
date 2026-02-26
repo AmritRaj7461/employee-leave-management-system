@@ -61,15 +61,12 @@ app.get("/", (req, res) => {
 
 // --- DATABASE CONNECTION ---
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI, {
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+  })
   .then(() => console.log("✅ MongoDB Connected: Cloud Atlas"))
   .catch((err) => {
     console.error("❌ MongoDB Connection Error:");
-    console.error(err);
+    console.error(err.message);
   });
-
-// --- SERVER START ---
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Production Server running on port ${PORT}`);
-});

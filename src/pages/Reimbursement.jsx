@@ -31,17 +31,19 @@ const Reimbursement = () => {
         try {
             const token = localStorage.getItem('token');
             const headers = { Authorization: `Bearer ${token}` };
+            console.log("Fetching from:", `${API_BASE_URL}/api/reimbursement/all`);
             const res = await axios.get(`${API_BASE_URL}/api/reimbursement/all`, { headers });
 
             if (Array.isArray(res.data)) {
                 const myClaims = res.data.filter(item => {
                     const applicantId = item.employeeId?._id || item.employeeId;
-                    return applicantId === user?.id;
+                    return String(applicantId) === String(user?.id);
                 });
+                console.log("Matched Claims for User:", myClaims);
                 setClaims(myClaims);
             }
         } catch (err) {
-            console.error("Expense sync interrupted.");
+            console.error("Expense sync interrupted.", err.response?.data || err.message);
         }
     };
 
