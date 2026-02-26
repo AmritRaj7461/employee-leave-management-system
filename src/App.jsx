@@ -49,7 +49,7 @@ function App() {
     if (!user) return;
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5000/api/notifications/pending', {
+      const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/notifications/pending`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -79,7 +79,7 @@ function App() {
     if (!notification) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.post('http://localhost:5000/api/notifications/mark-seen', {
+      await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/notifications/mark-seen`, {
         id: notification.id,
         category: notification.category
       }, {

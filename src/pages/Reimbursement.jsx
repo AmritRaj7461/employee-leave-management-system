@@ -9,7 +9,7 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Define the base URL for fetching uploaded files
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_SERVER_URL;
 
 const Reimbursement = () => {
     const { user } = useContext(AuthContext);
@@ -110,7 +110,7 @@ const Reimbursement = () => {
                             Expense <span className="text-indigo-600 italic">Claims</span>
                         </h1>
                     </div>
-                    
+
                 </header>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">

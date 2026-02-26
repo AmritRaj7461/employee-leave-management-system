@@ -6,6 +6,7 @@ import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
 import { motion } from 'framer-motion';
 
+
 const ApplyLeave = () => {
     const { user } = useContext(AuthContext);
     const { isDarkMode } = useContext(ThemeContext);
@@ -28,7 +29,7 @@ const ApplyLeave = () => {
     const fetchHistory = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get(`http://localhost:5000/api/leaves/user/${user.id}`, {
+            const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/leaves/user/${user.id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (Array.isArray(res.data)) setLeaves(res.data);
@@ -43,7 +44,7 @@ const ApplyLeave = () => {
         e.preventDefault();
         const token = localStorage.getItem('token');
         try {
-            await axios.post('http://localhost:5000/api/leaves/apply', formData, {
+            await axios.post(`${import.meta.env.VITE_SERVER_URL}/api/leaves/apply`, formData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             alert("Request Submitted.");
@@ -88,7 +89,7 @@ const ApplyLeave = () => {
                     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="lg:col-span-5">
                         <form onSubmit={handleSubmit} className={`${cardBg} p-8 md:p-10 rounded-[2.5rem] space-y-8 border-t border-white/5`}>
                             <h2 className={`text-xl md:text-2xl font-black flex items-center gap-3 ${textColor}`}>
-                                <div className="p-2 bg-blue-600 rounded-lg"><Send size={20} className="text-white" /></div> 
+                                <div className="p-2 bg-blue-600 rounded-lg"><Send size={20} className="text-white" /></div>
                                 New Request
                             </h2>
 
@@ -149,10 +150,9 @@ const ApplyLeave = () => {
                                             <tr key={leave._id} className="group hover:bg-blue-600/[0.02] transition-all">
                                                 <td className="px-10 py-8">
                                                     <div className={`font-black text-lg ${textColor}`}>{leave.leaveType}</div>
-                                                    <span className={`mt-2 inline-flex items-center px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter ${
-                                                        leave.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
+                                                    <span className={`mt-2 inline-flex items-center px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter ${leave.status === 'Approved' ? 'bg-emerald-500/10 text-emerald-500' :
                                                         leave.status === 'Rejected' ? 'bg-rose-500/10 text-rose-500' : 'bg-orange-500/10 text-orange-500'
-                                                    }`}>
+                                                        }`}>
                                                         <div className={`w-1.5 h-1.5 rounded-full mr-2 ${leave.status === 'Approved' ? 'bg-emerald-500' : leave.status === 'Rejected' ? 'bg-rose-500' : 'bg-orange-500'}`} />
                                                         {leave.status}
                                                     </span>

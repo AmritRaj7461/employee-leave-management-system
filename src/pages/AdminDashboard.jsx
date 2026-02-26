@@ -8,7 +8,7 @@ import {
 import { ThemeContext } from '../context/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_SERVER_URL;
 
 const AdminDashboard = () => {
     const navigate = useNavigate();

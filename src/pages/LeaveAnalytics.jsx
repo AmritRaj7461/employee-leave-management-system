@@ -18,7 +18,7 @@ const LeaveAnalytics = () => {
     useEffect(() => {
         const fetchAnalytics = async () => {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/api/leaves/all', {
+            const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/leaves/all`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // Logic to group leaves by month

@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
+require("dotenv").config();
 
 // Route Imports
 const authRoutes = require("./routes/authRoutes");
@@ -11,7 +12,6 @@ const reimbursementRoutes = require("./routes/reimbursementRoutes"); // NEW
 const notificationRoutes = require("./routes/notificationRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 
-dotenv.config();
 const app = express();
 
 app.use(express.json());

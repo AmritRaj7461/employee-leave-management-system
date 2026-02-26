@@ -22,7 +22,7 @@ const ManagerDashboard = () => {
     const fetchAll = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/api/leaves/all', {
+            const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/leaves/all`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
@@ -43,7 +43,7 @@ const ManagerDashboard = () => {
     const updateStatus = async (id, status) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:5000/api/leaves/status/${id}`, { status }, {
+            await axios.put(`${import.meta.env.VITE_SERVER_URL}/api/leaves/status/${id}`, { status }, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             fetchAll();

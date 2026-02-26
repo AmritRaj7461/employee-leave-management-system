@@ -98,7 +98,7 @@ const EmployeeDashboard = () => {
     const fetchData = async () => {
         const token = localStorage.getItem('token');
         try {
-            const res = await axios.get(`http://localhost:5000/api/leaves/user/${user.id}`, {
+            const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/api/leaves/user/${user.id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setHistory(res.data.slice(0, 5));

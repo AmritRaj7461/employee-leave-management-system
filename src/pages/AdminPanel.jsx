@@ -49,8 +49,8 @@ const AdminPanel = () => {
         const headers = { Authorization: `Bearer ${token}` };
         try {
             const [userRes, configRes] = await Promise.all([
-                axios.get('http://localhost:5000/api/auth/users', { headers }),
-                axios.get('http://localhost:5000/api/admin/config', { headers }).catch(() => ({ data: config }))
+                axios.get(`${import.meta.env.VITE_SERVER_URL}/api/auth/users`, { headers }),
+                axios.get(`${import.meta.env.VITE_SERVER_URL}/api/admin/config`, { headers }).catch(() => ({ data: config }))
             ]);
             setUsers(userRes.data);
             setConfig(configRes.data);
@@ -68,7 +68,7 @@ const AdminPanel = () => {
         setConfig(newConfig);
         try {
             const token = localStorage.getItem('token');
-            await axios.put('http://localhost:5000/api/admin/config', newConfig, { headers: { Authorization: `Bearer ${token}` } });
+            await axios.put(`${import.meta.env.VITE_SERVER_URL}/api/admin/config`, newConfig, { headers: { Authorization: `Bearer ${token}` } });
             fetchData();
         } catch (err) { console.error("Sync failed."); }
     };
